@@ -20,4 +20,12 @@ The quizzes, drag-and-drop activities, explorable visualizations, code exercises
 | [Vide](vide/) | Fine-grained reactive UI | Library | 24 |
 | [Rojo](rojo/) | File sync for Roblox Studio | Tool | 24 |
 
+## License
+
+These course pages are licensed [CC BY-SA 4.0](LICENSE). Share and adapt them freely, including commercially, as long as you credit Kalo (https://kalo.gg) and license what you build from them the same way.
+
+Library, tool and company names belong to their own authors. Kalo is independent and is not affiliated with or endorsed by the projects it teaches.
+
+---
+
 Generated from the course content by `scripts/export-courses.ts` in the Kalo frontend. Edit the course there, not here.
