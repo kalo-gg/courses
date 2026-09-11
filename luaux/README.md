@@ -6,7 +6,7 @@
 
 LuauX compiles `.luaux` files — JSX-style markup — into plain Luau that calls React, Vide, Fusion or Fluid, and ships nothing to the game. This course covers the syntax and the one place reactivity is implicit, components, how the same markup lowers to four libraries, the compiler and the larvae worm that give markup files a formatter, a linter and editor support, and the patterns that keep a screen debuggable. Across two projects you build a **settings screen** — toggles, a keybind list and a confirm dialog — first for Vide, then wired into Rojo and ported to a second backend.
 
-- **Library** [luaux](https://github.com/luau-xml/luaux)
+- **Library** [LuauX](https://github.com/luau-xml/luaux)
 - **Verified against** 0.2.0
 - **Course** 6 modules · 32 lessons on kalo.gg, 24 of them written out here
 - **Authors** @crota · sponsored by @crota

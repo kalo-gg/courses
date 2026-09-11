@@ -10,15 +10,19 @@ The quizzes, drag-and-drop activities, explorable visualizations, code exercises
 
 | Course | About | Kind | Lessons |
 | --- | --- | --- | --- |
+| [Luau Fundamentals](luau-fundamentals/) | The language Roblox runs on, from the ground up | Language | 24 |
+| [Luau Intermediate](luau-intermediate/) | Types, metatables and the shape of real code | Language | 24 |
+| [Luau Advanced](luau-advanced/) | Performance, metaprogramming and the runtime underneath | Language | 24 |
 | [JECS](jecs/) | Entity Component System for Roblox | Library | 32 |
 | [Fusion](fusion/) | Reactive UI for Roblox | Library | 24 |
 | [Fluid](fluid/) | Declarative UI, rewritten from Vide | Library | 24 |
 | [Larvae](larvae/) | One toolchain for Luau | Tool | 24 |
-| [LuauX](luaux/) | JSX for Luau | Tool | 24 |
+| [LuauX](luaux/) | JSX for Luau | Language | 24 |
 | [pesde](pesde/) | Packages for Luau | Tool | 24 |
 | [Lest](lest/) | Testing for Luau | Tool | 24 |
 | [Vide](vide/) | Fine-grained reactive UI | Library | 24 |
 | [Rojo](rojo/) | File sync for Roblox Studio | Tool | 24 |
+| [Wally](wally/) | Package manager for Roblox | Tool | 24 |
 
 ## License
 

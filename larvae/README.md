@@ -9,7 +9,7 @@ larvae replaces the usual pile of stylua, selene, darklua and a language server 
 - **Library** [larvae](https://github.com/larvae-luau/larvae)
 - **Verified against** 0.8.1
 - **Course** 6 modules · 32 lessons on kalo.gg, 24 of them written out here
-- **Authors** @crota, @savruun · sponsored by @savruun
+- **Authors** @crota, @sav · sponsored by @sav
 
 ## Modules
 
