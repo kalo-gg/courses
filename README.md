@@ -20,6 +20,7 @@ The quizzes, drag-and-drop activities, explorable visualizations, code exercises
 | [LuauX](luaux/) | JSX for Luau | Language | 24 |
 | [pesde](pesde/) | Packages for Luau | Tool | 24 |
 | [Lest](lest/) | Testing for Luau | Tool | 24 |
+| [Scribe](scribe/) | Persistent player data for Roblox | Library | 28 |
 | [Vide](vide/) | Fine-grained reactive UI | Library | 24 |
 | [Rojo](rojo/) | File sync for Roblox Studio | Tool | 24 |
 | [Wally](wally/) | Package manager for Roblox | Tool | 24 |
