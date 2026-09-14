@@ -10,7 +10,7 @@ Scribe is a Luau library for player data built on ProfileStore: you declare the 
 - **Written by** ericplane
 - **Verified against** 2.3.0
 - **Course** 7 modules · 38 lessons on kalo.gg, 28 of them written out here
-- **Authors** @crota
+- **Authors** @crota · endorsed by @ericplane
 
 ## Modules
 

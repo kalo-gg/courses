@@ -9,7 +9,7 @@ LuauX compiles `.luaux` files — JSX-style markup — into plain Luau that call
 - **Library** [LuauX](https://github.com/luau-xml/luaux)
 - **Verified against** 0.2.0
 - **Course** 6 modules · 32 lessons on kalo.gg, 24 of them written out here
-- **Authors** @crota · sponsored by @crota
+- **Authors** @crota · endorsed by @crota
 
 ## Modules
 

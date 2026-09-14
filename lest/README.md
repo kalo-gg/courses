@@ -9,7 +9,7 @@ Lest is a single binary carrying the test framework inside it, so the runner and
 - **Library** [lest](https://github.com/lest-luau/lest)
 - **Verified against** 0.6.0
 - **Course** 6 modules · 32 lessons on kalo.gg, 24 of them written out here
-- **Authors** @crota · sponsored by @crota
+- **Authors** @crota · endorsed by @crota
 
 ## Modules
 
