@@ -574,7 +574,7 @@ The two ends of replecs replication. Markers: `replecs.shared`, `replecs.network
 | [Planck](https://github.com/YetAnotherClown/Planck) | Scheduler (phases, pipelines) | 0.2.0 (0.3.0-rc.2) | `yetanotherclown/planck@0.2.0 + planck-runservice, planck-jabby` |
 | [replecs](https://github.com/PepeElToro41/replecs) | Replication | 0.3.1 (0.4.0-rc.3 for jecs 0.11) | `pepeeltoro41/replecs` |
 | [Zap](https://github.com/red-blox/zap) | Networking IDL → buffers | 0.6.29 | `rokit add red-blox/zap` |
-| [Blink](https://github.com/1Axen/blink) | Networking IDL → buffers | 0.18.8 (1.0.0-pre) | `rokit add 1Axen/blink` |
+| [Blink](https://github.com/1Axen/blink) | Networking IDL → buffers | 0.18.8 | `rokit add 1Axen/blink` |
 | [ByteNet](https://github.com/ffrostfall/ByteNet) | Networking (runtime packets) | 0.4.6 | `ffrostflame/bytenet@0.4.6` |
 | [jecs-utils / jecs-vide](https://github.com/PepeElToro41/jecs-utils) | Query helpers · Vide bindings | 1.4.4 / 1.0.8 | `pepeeltoro41/jecs-utils, pepeeltoro41/jecs-vide` |
 | [rubine](https://github.com/Mark-Marks/rubine) | Scheduler (alternative) | 0.3.0-alpha.2 | `mark-marks/rubine` |

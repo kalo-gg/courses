@@ -24,6 +24,7 @@ The quizzes, drag-and-drop activities, explorable visualizations, code exercises
 | [Vide](vide/) | Fine-grained reactive UI | Library | 24 |
 | [Rojo](rojo/) | File sync for Roblox Studio | Tool | 24 |
 | [Wally](wally/) | Package manager for Roblox | Tool | 24 |
+| [Blink](blink/) | Networking IDL for Roblox | Tool | 24 |
 
 ## License
 
