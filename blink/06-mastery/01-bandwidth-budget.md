@@ -58,7 +58,7 @@ The sandbox on this page reads that same comment and prints `block: <Name> = N b
 
 ## Working a budget
 
-The working, spelled out: 1 byte of id, 1 for the `u8`, 12 for the vector and 2 for the `u16`. Sixteen, times 20, times 40. Then compare it against what the same three values cost as a Luau table through a RemoteEvent, which is the gap Blink's own benchmark measured as 41.81 Kbps against 559,364.
+The working, spelled out: 1 byte of id, 1 for the `u8`, 12 for the vector and 2 for the `u16`. Sixteen, times 20, times 40. Then compare it against what the same three values cost as a Luau table through a RemoteEvent, which is the gap Blink's own benchmark measured as 41.81 Kbps against 559,364. The Roblox Intermediate course's *Remotes* module budgets plain remotes the same way.
 
 **Key points**
 

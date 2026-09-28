@@ -13,6 +13,9 @@ The quizzes, drag-and-drop activities, explorable visualizations, code exercises
 | [Luau Fundamentals](luau-fundamentals/) | The language Roblox runs on, from the ground up | Language | 24 |
 | [Luau Intermediate](luau-intermediate/) | Types, metatables and the shape of real code | Language | 24 |
 | [Luau Advanced](luau-advanced/) | Performance, metaprogramming and the runtime underneath | Language | 24 |
+| [Roblox Fundamentals](roblox-fundamentals/) | The engine under every Roblox game | Platform | 28 |
+| [Roblox Intermediate](roblox-intermediate/) | Client, server and the network between | Platform | 28 |
+| [Roblox Advanced](roblox-advanced/) | Data, scale and a game that stays up | Platform | 24 |
 | [JECS](jecs/) | Entity Component System for Roblox | Library | 32 |
 | [Fusion](fusion/) | Reactive UI for Roblox | Library | 24 |
 | [Fluid](fluid/) | Declarative UI, rewritten from Vide | Library | 24 |

@@ -53,6 +53,8 @@ It costs performance on every send and the documentation says to turn it off in 
 | Enum tags and struct shape | Whether the value makes sense for the game state |
 | A non-optional `Instance` actually arrived | The 1,000-byte unreliable ceiling |
 
+The right-hand column is the listener's job, which the Roblox Intermediate course's *Trust* module teaches.
+
 ## Your turn
 
 **Key points**
