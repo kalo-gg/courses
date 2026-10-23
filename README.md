@@ -13,14 +13,15 @@ The quizzes, drag-and-drop activities, explorable visualizations, code exercises
 | [Luau Fundamentals](luau-fundamentals/) | The language Roblox runs on, from the ground up | Language | 24 |
 | [Luau Intermediate](luau-intermediate/) | Types, metatables and the shape of real code | Language | 24 |
 | [Luau Advanced](luau-advanced/) | Performance, metaprogramming and the runtime underneath | Language | 24 |
-| [Roblox Fundamentals](roblox-fundamentals/) | The engine under every Roblox game | Platform | 28 |
-| [Roblox Intermediate](roblox-intermediate/) | Client, server and the network between | Platform | 28 |
-| [Roblox Advanced](roblox-advanced/) | Data, scale and a game that stays up | Platform | 24 |
+| [Roblox Fundamentals](roblox-fundamentals/) | The engine under every Roblox game | Engine | 28 |
+| [Roblox Intermediate](roblox-intermediate/) | Client, server and the network between | Engine | 28 |
+| [Roblox Advanced](roblox-advanced/) | Data, scale and a game that stays up | Engine | 24 |
 | [JECS](jecs/) | Entity Component System for Roblox | Library | 32 |
 | [Fusion](fusion/) | Reactive UI for Roblox | Library | 24 |
 | [Fluid](fluid/) | Declarative UI, rewritten from Vide | Library | 24 |
 | [Larvae](larvae/) | One toolchain for Luau | Tool | 24 |
 | [LuauX](luaux/) | JSX for Luau | Language | 24 |
+| [Alloy](alloy/) | Luau, with the parts it is missing | Language | 28 |
 | [pesde](pesde/) | Packages for Luau | Tool | 24 |
 | [Lest](lest/) | Testing for Luau | Tool | 24 |
 | [Scribe](scribe/) | Persistent player data for Roblox | Library | 28 |
