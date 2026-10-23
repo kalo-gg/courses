@@ -15,9 +15,8 @@ A typical Luau project runs stylua to format, selene to lint, darklua to transfo
 | `larvae check` | Validates requires and syntax across the project, writing nothing |
 | `larvae fmt` | Formats in place, with stylua's options under stylua's names |
 | `larvae lint` | Reports suspicious code — 64 lints |
-| `larvae analyze` | Type diagnostics in the terminal — by spawning `larvae-lsp` |
 | `larvae bundle` | Collects the project into a single file |
-| `larvae lsp` | Serves an editor over stdio: lint and format, no types |
+| `larvae lsp` | Serves an editor over stdio: lints, formatting and fixes, and no types |
 | `larvae worm` | Manages extensions — worms, which get a module of their own |
 | `larvae self` | Installs and updates larvae, and wires up your editor |
 
@@ -35,13 +34,13 @@ before                      after
 
 The second Rojo project file is the tell of a darklua pipeline: one points at the source, one at the build. larvae derives the second from the first.
 
-> **"One binary" has a footnote**
+> **One binary, and luau-lsp beside it**
 >
-> Two of those ten jobs are not in the `larvae` binary. The Luau **analyzer** lives in a second crate, `larvae-lsp`. `larvae lsp` on its own serves lints, formatting, code actions and the outline and **no types**; `larvae analyze` does nothing at all except find `larvae-lsp` and hand the arguments over. Everything else in this course is genuinely one binary reading one file — but plan on installing two.
+> Every job in that table is in the one `larvae` binary. What larvae does not do is types: hover, completion and type diagnostics belong to **luau-lsp**, which runs beside `larvae lsp` in your editor. larvae lints, formats and offers fixes; luau-lsp types; the two servers never answer the same request.
 
-> **You are already using it**
+> **The same split in Kalo's editors**
 >
-> Every code editor in these Kalo lessons is backed by `larvae-lsp`. The squiggles under a mistake, the hover types, the completions — that is the tool this course is about, running on Kalo's server as you read.
+> The hover types and completions in these Kalo lessons come from luau-lsp, the server larvae leaves the types to. Your own setup will have the same split, with larvae adding the lints and the formatter.
 
 ## The part most projects came for
 
@@ -61,11 +60,11 @@ local Signal = require("@pkg/signal")
 
 The alias `pkg` is one line in `larvae.toml`. Move the folder and you change that line, not the project.
 
-The ten commands sort into three groups. Four write files: `init`, `fmt`, `process` and `bundle`. Three only report: `check`, `lint` and `analyze` — plus `fmt --check`, which is `fmt` with its hands tied rather than a command of its own. Three serve or manage: `lsp` for your editor, `worm` for extensions, `self` for larvae itself. CI wants the reporting group and nothing from the first; your editor talks to the third without you typing anything.
+The nine commands sort into three groups. Four write files: `init`, `fmt`, `process` and `bundle`. Two only report: `check` and `lint` — plus `fmt --check`, which is `fmt` with its hands tied rather than a command of its own. Three serve or manage: `lsp` for your editor, `worm` for extensions, `self` for larvae itself. CI wants the reporting group and nothing from the first; your editor talks to the third without you typing anything.
 
 **Key points**
 
-- One binary reads one `larvae.toml` and does nine of the ten jobs; the Luau analyzer is the tenth and lives in `larvae-lsp`.
+- One binary reads one `larvae.toml` and does every job; types are luau-lsp's, which runs beside it.
 - Existing `stylua.toml` and `selene.toml` files are read first; `[fmt]` and `[lint]` layer over them.
 - The require rewriter is the job the other tools do not do: one alias, three output shapes, checked on the way.
-- `check`, `lint`, `analyze` and `fmt --check` write nothing — they are the CI group.
+- `check`, `lint` and `fmt --check` write nothing — they are the CI group.

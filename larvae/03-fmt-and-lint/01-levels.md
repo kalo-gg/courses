@@ -21,7 +21,7 @@ larvae ships 64 lints, and every one has a level. Four levels exist, and the dif
 
 The project states the rule plainly: a lint denies only when the code cannot be what the author meant, and no reading of it makes the finding wrong. Everything softer warns, and a matter of taste stays `allow` until a project asks for it. That gives six denies, eleven allows, and forty-seven warns.
 
-(Counted from the source. `larvae.example.toml` says sixty-three and the README says thirty-four — the set grows every release, and the docs lag it. Sixty-four is what `lint/lints/mod.rs` actually registers at 0.8.1.)
+(Counted from the source. `larvae.example.toml` says sixty-three and the README says thirty-four — the set grows every release, and the docs lag it. Sixty-four is what `lint/lints/mod.rs` actually registers at 0.10.0.)
 
 | The six denies | Why there is no other reading |
 | --- | --- |

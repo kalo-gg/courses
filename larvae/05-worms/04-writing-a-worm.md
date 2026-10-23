@@ -49,16 +49,25 @@ default     = "warn"
 
 Formatter options and settings are declared the same way — `[fmt.<name>]` with a type, permitted values and a default, and `[options.<name>]` for whatever the worm reads from its `config` table. `luaux-worm` has exactly one of the latter, pointing at the `luaux.toml` that holds everything the compiler itself cares about.
 
-**The editor hooks**
+**A worm that lints plain Luau**
 
 ```toml
-[lsp]
-resolve = true
-serves_luau = true
-respond = ["hover", "completions"]
+name       = "privacy"
+api        = 1
+form       = "luau"
+entry      = "init.luau"
+lints_luau = true      # run this worm's lint over every plain Luau file
+
+[lints.private_access]
+description = "A field whose name starts with _ read from outside its class"
+default     = "warn"
 ```
 
-A worm can resolve requires of its own files, answer hover and completion requests for them, and — with `serves_luau` — answer inside plain `.luau` documents too. **These hooks need `form = "native"`.** They run on the analyzer's hot path — resident and synchronous — and the luau and wasm forms spin an interpreter per call, which that path cannot afford. A manifest that declares `[lsp]` on either of them is refused when it loads, not at the first request.
+A worm need not claim anything. `lints_luau = true` runs its lint over ordinary `.luau` files, after the builtin lints and under the same levels and allow comments — and over a claimed file's shadow too, when its worm sets `shared`. With no `[frontend]`, no rules and no `lints_luau`, larvae refuses the manifest: it would never run.
+
+> **Recognising older code**
+>
+> A manifest written before 0.10 may carry an `[lsp]` table — `resolve`, `declarations`, `respond`, `serves_luau` — that fed larvae's type analyzer. The analyzer is gone, so the table still loads, larvae prints one note per worm, and the hooks do nothing. Delete it. A worm's editor answers now are its findings, its layout and its code actions.
 
 Iterating on a worm needs no install at all: **`larvae worm run <dir> <file>`** passes one file through a worm directory, with `--fmt` or `--lint` to exercise those paths instead, and **`larvae worm info <dir>`** reports what it declares. When you are ready to wire it into a project, name it by `path` rather than `repo`. The rest of the family is `add`, `install`, `claims`, `remove` and `types` — the last writes the Luau type definitions a worm author codes against.
 
@@ -69,7 +78,7 @@ Iterating on a worm needs no install at all: **`larvae worm run <dir> <file>`** 
 **What you can do now**
 
 - Explain why a worm returns structure rather than formatted text, and findings without levels.
-- Weigh the three forms, and know that `native` buys speed and editor hooks by giving up the sandbox.
+- Weigh the three forms, and know that `native` buys speed by giving up the sandbox.
 - Install a worm and configure everything it adds under its own key — remembering the dotted `<worm>.<lint>` name everywhere else.
-- Read a `worm.toml` and know what the worm claims, reports and offers.
+- Read a `worm.toml` and know what the worm claims, reports and offers — including a worm that claims nothing and lints plain Luau.
 - Iterate on one locally with `larvae worm run` and `larvae worm info`, no install required.

@@ -414,7 +414,7 @@ The gate: `check` compiles everything, writes nothing, and exits non-zero on the
 
 ## Editor & the larvae worm
 
-LuauX has no editor plugin. Everything below is larvae's, and it is what makes a `.luaux` file behave like the `.luau` beside it.
+Lints and formatting are larvae's, through the worm, and they make a `.luaux` file behave like the `.luau` beside it. Types come from LuauX's own editor extension, the last entry.
 
 ### `luaux-worm`
 
@@ -484,10 +484,11 @@ One allow comment, the same vocabulary as every other larvae lint.
 ### `What the editor gets`
 
 ```luau
-completions · hover · formatting
+larvae lsp: findings · formatting · fixes
+LuauX LSP: completions · hover · types
 ```
 
-`larvae-lsp` routes a `.luaux` document to the worm, which compiles it before the analyzer sees it.
+`larvae lsp` hands a `.luaux` buffer to the worm for its findings, layout and fixes. The LuauX LSP extension (`RyanCundiff.luaux-lsp`) answers everything typed: it compiles the file in memory and asks a luau-lsp child about the Luau inside.
 
 > **No diagnostics on Kalo**, on purpose: several exercises are markup fragments, and a fragment is an expression rather than a file. The editor completes class and property names; it does not underline a typo.
 
@@ -591,10 +592,11 @@ The key Fusion parents instances under, and the value of `[factory] children` in
 | Package | Role | Version | Install |
 | --- | --- | --- | --- |
 | [luaux](https://github.com/luau-xml/luaux) | The compiler and CLI | 0.2.0 | `lpm tool add luaux` |
-| [luaux-worm](https://github.com/larvae-luau/luaux-worm) | Editor and toolchain support | — | `[worms] luaux = { repo = "larvae-luau/luaux-worm", version = "^" }` |
+| [luaux-worm](https://github.com/larvae-luau/luaux-worm) | Lints and formatting for `.luaux` inside larvae | 0.2.2 | `[worms] luaux = { repo = "larvae-luau/luaux-worm", version = "^" }` |
+| [LuauX LSP](https://github.com/luau-xml/lsp) | Editor extension: completions, hover and types for `.luaux` | 0.2.2 | `code --install-extension RyanCundiff.luaux-lsp` |
 | [Vide](https://github.com/centau/vide) | The UI library this course's examples target | 0.4.1 | `centau/vide (wally) · build.rbxm on GitHub releases` |
 | [Rojo](https://github.com/rojo-rbx/rojo) | Syncs the compiled output into Studio | 7.7.0 | `rokit add rojo-rbx/rojo` |
-| [larvae](https://github.com/larvae-luau/larvae) | The toolchain that hosts the worm | 0.8.1 | `cargo install larvae larvae self install` |
+| [larvae](https://github.com/larvae-luau/larvae) | The toolchain that hosts the worm | 0.10.0 | `cargo install larvae larvae self install` |
 | [Rokit](https://github.com/rojo-rbx/rokit) | Toolchain manager: pins luaux and rojo for a repository and for CI | 1.2.0 | `curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh \| bash` |
 
 ## Out of date elsewhere
@@ -608,4 +610,4 @@ Shapes you may still meet in older tutorials:
 - **`[worms] luaux = "larvae-luau/luaux-worm@1.0"`.** The string form of a worm entry was removed in larvae v0.5.0 and is now refused outright; a worm is a table with `repo` and `version`. It still appears in older configs and in `luaux-worm`'s own README.
 - **"`--` starts a comment in markup."** It does not. Inside markup `--` is ordinary text, so `-- TODO` between a label's tags ends up on screen. The comment spellings are `<!-- … -->` between tags and `{--[[ … ]]}` in child position.
 - **Lint levels spelled `allow` / `deny`.** Those are larvae's, for the worm's lints in `larvae.toml`. The compiler's own `[lints]` in `luaux.toml` take `off`, `warn` and `error`, and `static_conditional_child` — its only lint — defaults to `warn` under the table backend and `off` under the element backend.
-- **"LuauX ships a language server or a Studio plugin."** It ships neither. Editor support is the larvae worm inside `larvae-lsp`, which gives `.luaux` files completions, hover and formatting; the compiler itself is a terminal binary that runs beside `rojo serve`.
+- **`.luaux` completions and hover from `larvae-lsp`.** Before larvae 0.10 the worm's `[lsp]` hooks fed `larvae-lsp`'s analyzer. 0.10 deleted that binary and the hooks: `larvae lsp` serves the worm's findings, formatting and fixes only. Completions, hover and types come from the LuauX LSP extension (`luau-xml/lsp`), which runs luau-lsp. Older guides that say LuauX has no language server of its own are wrong too. The compiler itself is still a terminal binary that runs beside `rojo serve`.

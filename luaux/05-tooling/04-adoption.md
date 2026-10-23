@@ -43,4 +43,4 @@ Install Rokit the way your CI already does; the LuauX step is one line and it fa
 - Install LuauX and run `build`, `check`, `watch`, `init` and `scan`.
 - Sit a compile step beside `rojo serve`, and a `luaux check` in CI, without changing the Rojo project until the end.
 - Read a LuauX diagnostic and trust its line numbers.
-- Get editor support from `luaux-worm`, and migrate a project one file at a time.
+- Lint and format `.luaux` through `luaux-worm`, type it through the LuauX extension, and migrate a project one file at a time.

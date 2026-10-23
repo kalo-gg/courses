@@ -23,13 +23,13 @@ One command in the job does download: `larvae worm install`, because the worms `
 
 ## Installing larvae in a job
 
-The job needs the binary, and the analyzer only if it runs `larvae analyze`. `cargo install larvae` works everywhere and is slow; a tool manager with a pinned manifest is the usual route, and a `rokit.toml` that pins `larvae` is what Lantern commits so every machine and every job runs the same release. Whichever installs it, `larvae self install` is what fetches `larvae-lsp` beside it when a job wants types.
+The job needs one binary. `cargo install larvae` works everywhere and is slow; a tool manager with a pinned manifest is the usual route, and a `rokit.toml` that pins `larvae` is what Lantern commits so every machine and every job runs the same release. Type errors are not larvae's gate any more: a job that wants them adds a `luau-lsp analyze` step of its own, with the same definitions the editor loads.
 
 **rokit.toml**
 
 ```toml
 [tools]
-larvae = "larvae-luau/larvae@0.8.1"
+larvae = "larvae-luau/larvae@0.10.0"
 ```
 
 **.github/workflows/ci.yml**

@@ -53,7 +53,7 @@ unused_variable = "deny"
 
 > **Arrays replace, tables merge**
 >
-> `[profile.release.process] exclude = ["**/*.spec.luau"]` does not add to the root's exclude list — it replaces it. Write the full list in the profile, or keep the shared list in the root and put only scalars in the profile.
+> `[profile.release.process] exclude = ["**/*.spec.luau"]` does not add to the base's `[process] exclude` — it replaces it. Write the full list in the profile, or keep the shared list where the profile does not touch it: the root `exclude` is a different key, inherited by every command, and a profile's `[process]` list leaves it alone.
 
 Profiles are where the day's two builds live. The root is what you run under `--watch` all day, with `DEBUG = true` and comments kept; the release profile is what CI runs once, with logging folded out and, if you want it, the output minified — which is the next lesson. One file, and the difference between the two builds is readable in one place.
 

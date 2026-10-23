@@ -1,12 +1,12 @@
 # Larvae reference
 
-*Larvae 0.8.1, released September 4, 2026. Checked on September 7, 2026.*
+*Larvae 0.10.0, released October 21, 2026. Checked on October 23, 2026.*
 
 ---
 
 ## Commands
 
-Ten jobs, one larvae.toml. Nine of them live in the larvae binary; `analyze` spawns a second one.
+Nine commands, one binary, one larvae.toml. Types are luau-lsp's, beside it.
 
 ### `larvae init`
 
@@ -62,13 +62,7 @@ larvae lint --stdin
 
 Reports suspicious code without changing it. `--explain` describes any one of the 64 lints, worm lints included.
 
-### `larvae analyze`
-
-```luau
-larvae analyze [paths…] --definitions <file>
-```
-
-Type diagnostics in the terminal, from the same analyzer the editor uses. The command has two halves: it finds the `larvae-lsp` binary and hands the arguments over, so it does nothing at all without that binary installed.
+> Every command that walks the project ends its summary line with the wall-clock time of the run, since 0.9: `2 files, nothing to report in 1ms`.
 
 ### `larvae bundle`
 
@@ -84,7 +78,9 @@ Collects the project into a single file. Modules load on demand, so bundling can
 larvae lsp
 ```
 
-Serves an editor over stdio — lint, format, code actions and the outline, and no types. Hover, completion and type diagnostics come from the separate `larvae-lsp` binary, which plugs Luau's analysis frontend into the same server.
+Serves an editor over stdio: diagnostics (the lints, the worms' findings and the cross-realm requires), formatting, and code actions. Nothing else — hover, completion, inlay hints, navigation and type diagnostics are luau-lsp's, which runs beside it, so the two servers never answer the same request.
+
+> There is no `larvae analyze` and no `larvae-lsp` binary since 0.10. Type checks in a terminal are `luau-lsp analyze`.
 
 ### `larvae worm`
 
@@ -104,7 +100,7 @@ larvae worm <run|info|types|add|install|claims|remove>
 larvae self <install|update|uninstall|code|sync-luaurc>
 ```
 
-`install` copies the binary to `~/.larvae/bin` and fetches `larvae-lsp` and its analyzer library when they are not beside it — which is what a rokit or aftman user needs, because a tool manager installs only the binary its manifest names. `code` sets up schema completion and hover on `larvae.toml`. `sync-luaurc [--check]` writes the project's aliases into `.luaurc` as paths an editor can follow.
+`install` copies the running binary to `~/.larvae/bin` and prints the `PATH` line (on Windows it writes the registry). `install` and `update` both delete a `larvae-lsp` binary and its `eclipse_analysis` library that a release before 0.10 left there, so an older editor extension cannot start the retired server. `update` refuses a copy a tool manager or cargo owns. `code` sets up schema completion and hover on `larvae.toml`. `sync-luaurc [--check]` writes the project's aliases into `.luaurc` as paths an editor can follow.
 
 > Two of the five are not installation management at all. `larvae self code` is what makes `larvae.toml` complete as you type it.
 
@@ -216,9 +212,24 @@ magic_trailing_comma = true
 space_inside_braces = true
 trailing_comma = true
 block_newline_gaps = "never"
+table_newline_gaps = "preserve"
+call_chains = { style = "preserve", min_calls = 3, preserve_breaks = true }
 ```
 
 The three `true`s are larvae's own opinion, on by default because the Luau community already writes that way — and they will change your files on the first run. `magic_trailing_comma` makes the author's trailing comma mean "keep this table expanded", which also means a hand-aligned table with a trailing comma is *exploded* to one entry per line rather than collapsed.
+
+> `table_newline_gaps` (0.9) keeps one blank line between a table's fields where the author left one; `never` closes every gap, the layout before 0.9. `call_chains.preserve_breaks` (0.9, on by default) keeps a chain already written over several lines open under `method` and `full`. Neither is one of the three opinions `recommended = false` turns off.
+
+### `Layout changes in 0.10`
+
+```luau
+collapse_simple_statement = "preserve"   # or "input", stylua's name
+
+[fmt.type_operators]
+expand = "auto"
+```
+
+`preserve` keeps the shape the author wrote, for functions and conditionals both: one line stays one line while it fits `column_width`, and a statement written open stays open. A `stylua.toml` with `CollapseSimpleStatement = "Input"` reads as `preserve`. `type_operators.expand = "auto"` now opens a union or intersection one member per line past `column_width`, as stylua does; before 0.10 it stayed on one line at any width.
 
 ### `[fmt] unused_imports`
 
@@ -315,6 +326,8 @@ loadstring = "ship the code instead"
 ```
 
 Per-lint settings — selene calls the same table `config`, and that spelling is accepted. `restricted_globals` and `restricted_module_paths` take a name and the reason a reader is shown; `deprecated.additional` maps an old name to its replacement; `unused_variable` takes `parameters`, `loop_variables` and `ignore_pattern`.
+
+> Since 0.9, `deprecated` reports `:Remove()` only where the receiver roots at `game`, `script` or `workspace`, because `Trove:Remove()` is not deprecated. `[lint.options.deprecated] ambiguous_methods = true` matches the name on any receiver.
 
 ### `Luau parity`
 
@@ -467,9 +480,9 @@ defines = { DEBUG = false }
 # larvae process --profile release
 ```
 
-Nine tables a profile may overlay — `aliases`, `bundle`, `defines`, `fmt`, `lint`, `minify`, `process`, `requires`, `rules` — merged over the root when `--profile` is passed. Tables merge per key; arrays and scalars are replaced whole.
+Every key the root takes — `input`, `exclude`, `[process]`, `[rojo]`, `[worms]`, `[check]`, `[lsp]` and the rest — merged over the root when `--profile` is passed. Tables merge per key; arrays and scalars are replaced whole, and only the same key is replaced: a profile's `[process] exclude` replaces the base's `[process] exclude` and leaves the root `exclude` alone.
 
-> Root keys, `extends`, `[check]`, `[rojo]`, `[worms.*]` and `[lsp]` are **not** among them: a profile changes how this tree builds, not what the tree is or what the editor answers.
+> `extends` and `profile` are the two exceptions; they resolve before the merge. The loader always merged raw TOML, but the published schema refused the root keys in a profile until 0.10 (#41), so an editor flagged them.
 
 ## The gate & CI
 
@@ -517,65 +530,54 @@ What a CI job runs. The four gates write nothing and each fails on its own condi
 
 ## The editor
 
-One `[lsp]` table, and the second binary that carries the types.
+`larvae lsp` lints and formats; luau-lsp, beside it, types. One short `[lsp]` table.
 
-### `[lsp] claim_only`
+### `[lsp] enabled / claim_only`
 
 ```luau
 [lsp]
+enabled = true       # the default
 claim_only = false   # the default
 ```
 
-`true` answers only for the files a worm claims, so stock luau-lsp keeps every plain `.luau` document. This is the partial-adoption switch: larvae owns your `.luaux` files and nothing else. The plan upstream is to make it the default once the analyzer era settles, as a stated breaking change.
+`enabled = false` answers every request with nothing, so another server owns the files. `claim_only = true` lints and formats only the files a worm claims and leaves plain Luau to other tools — the partial-adoption switch: larvae owns your `.luaux` files and nothing else.
 
-### `[lsp] enabled / analyzer`
+> `[fmt] enabled = false` and `[lint] enabled = false` are the same idea per tool: take the require rewriter alone and keep stylua and selene. The CLI never reads `[lsp]`.
 
-```luau
-enabled = true
-analyzer = true
-```
-
-`enabled = false` answers every request with nothing, so another server owns the files entirely. `analyzer = false` keeps the lints, formatting, code actions and outline and drops hover, completion and type diagnostics — the serving larvae had before the analyzer landed.
-
-> `[fmt] enabled = false` and `[lint] enabled = false` are the same idea per tool: take the require rewriter alone and keep stylua and selene.
-
-### `[lsp] roblox_security_level`
+### `[lsp.<worm>]`
 
 ```luau
-roblox_security_level = "roblox-script-security"
-# or "none", "local-user-security", "plugin-security"
+[lsp.markup]
+strict = false   # an option the markup worm declares under [options]
 ```
 
-Which Roblox API surface the analyzer types against. The default holds every member; a plugin or a LocalScript sees less at runtime, and this is how the editor is told so.
+A worm's editor settings, keyed by its name. Each key is checked against the worm's own `[options]`, so a typo, a wrong type, or a name that is no worm warns instead of doing nothing.
 
-### `[lsp] definitions / documentation`
+### `luau-lsp beside it`
 
 ```luau
-# definitions = ["types/global.d.luau"]
-# documentation = ["types/documentation.json"]
+"[luau]": {
+  "editor.defaultFormatter": "AndrewBordis.larvae",
+  "editor.formatOnSave": true
+},
+"luau-lsp.types.definitionFiles": { "@lantern": "types/lantern.d.luau" }
 ```
 
-Extra type definition files and their docs, the same files `larvae analyze --definitions` takes. `sourcemap` and `sourcemap_autogenerate` sit here too: the server can run rojo's sourcemap watch itself, or stay out of the way of one you already run.
+The setup upstream recommends: the Larvae extension (which launches `larvae lsp`) and the luau-lsp extension, with larvae named as the Luau formatter. Definitions, the sourcemap, inlay hints and auto-imports are luau-lsp settings; luau-lsp also runs `rojo sourcemap --watch` itself (`luau-lsp.sourcemap.autogenerate`, on by default).
 
-### `[lsp] sourcemap, and the [lsp.*] subtables`
+> In Zed, the larvae extension runs beside the Luau extension; name `larvae` under `languages.Luau.formatter`. Zed sends a server files by language, so a `.luaux` file gets no larvae diagnostics there yet.
+
+### `Retired [lsp] keys`
 
 ```luau
-[lsp]
-sourcemap = "sourcemap.json"                  # default
-sourcemap_autogenerate = true                 # the server runs the command itself
-rojo_project_file = "default.project.json"    # what that command reads
-
-[lsp.completion.imports]
-require_style = "auto"     # always_relative | always_absolute | nearest_absolute
-use_const = true
-
-[lsp.inlay_hints]
-parameter_names = "literals"   # none | literals | all
+analyzer · roblox_security_level · definitions · documentation
+sourcemap · sourcemap_autogenerate · rojo_project_file · sourcemap_command
+character_type · color_picker · [lsp.completion] · [lsp.inlay_hints]
+[lsp.hover] · [lsp.signature_help] · [lsp.index] · [lsp.studio]
+[lsp.fflags] · [lsp.bytecode]
 ```
 
-The analyzer types against two things it cannot infer from the source: the shape of the DataModel, which the Rojo sourcemap gives it, and the globals the project defines, which `definitions` files give it. The server can generate the sourcemap itself or stay out of the way of a watch you already run.
-
-> `[lsp.completion]`, `[lsp.completion.imports]`, `[lsp.inlay_hints]`, `[lsp.signature_help]`, `[lsp.hover]`, `[lsp.index]`, `[lsp.studio]` (off by default — it opens a socket, port 3773) and `[lsp.fflags]` mirror luau-lsp's settings under larvae's names. Every inlay hint is off by default. `larvae analyze --definitions <file>` takes the same definitions on the command line, so CI and the editor type against the same world.
+The analyzer's keys, removed in 0.10. A project that still sets one loads, and the editor shows one warning per key naming luau-lsp; the key does nothing. Move what you need to luau-lsp's settings — `definitions` to `luau-lsp.types.definitionFiles`, `[lsp.inlay_hints] parameter_names` to `luau-lsp.inlayHints.parameterNames` — and delete the rest.
 
 ## Worms: extensions
 
@@ -629,7 +631,7 @@ form = "luau"   # or "wasm", or "native"
 
 Three of them. `luau` runs in an embedded VM and `wasm` in an interpreter; only `native` is an ordinary executable larvae talks to over a pipe. Native has native speed and **no sandbox** — it runs with the user's full access — so it is not the default and a project opts in per worm.
 
-> `[lsp]` hooks need the native form: a manifest that declares them on a luau or wasm worm is refused at load.
+> A crate from crates.io (`cargo = …`) is always the native form, because `cargo install` ships a binary. Every form answers the same capabilities, code actions included.
 
 ### `worm.toml`
 
@@ -643,7 +645,9 @@ entry = "luaux-worm"
 claims = [".luaux"]
 ```
 
-A worm's own manifest: what it is called, which API version it speaks, how it runs, and which file extensions it claims.
+A worm's own manifest: what it is called, which API version it speaks, how it runs, and which file extensions it claims. `lints_luau = true` (top level) runs the worm's lint over plain Luau, so a worm with no `[frontend]` still runs.
+
+> An `[lsp]` table (`resolve`, `declarations`, `respond`, `serves_luau`) is a pre-0.10 manifest. It still loads with one note per worm and does nothing.
 
 ### `The three jobs`
 
@@ -702,8 +706,8 @@ Whether larvae's own lints and formatter options run inside this worm's files, a
 
 | Package | Role | Version | Install |
 | --- | --- | --- | --- |
-| [larvae](https://github.com/larvae-luau/larvae) | The toolchain | 0.8.1 | `cargo install larvae larvae self install` |
-| [larvae-lsp](https://crates.io/crates/larvae-lsp) | The editor server, with the Luau analyzer | 0.8.1 | `cargo install larvae-lsp` |
+| [larvae](https://github.com/larvae-luau/larvae) | The toolchain | 0.10.0 | `cargo install larvae larvae self install` |
+| [luau-lsp](https://github.com/JohnnyMorganz/luau-lsp) | The types, beside larvae in the editor | 1.70.1 | `VS Code: the luau-lsp extension (JohnnyMorganz.luau-lsp) rokit add JohnnyMorganz/luau-lsp   # for luau-lsp analyze in CI` |
 | [luaux-worm](https://github.com/larvae-luau/luaux-worm) | A worm for LuauX markup | — | `larvae worm add luaux larvae worm install` |
 | [Rokit](https://github.com/rojo-rbx/rokit) | Toolchain manager: pins larvae per repository | 1.2.0 | `rokit add larvae-luau/larvae` |
 | [Rojo](https://github.com/rojo-rbx/rojo) | Syncs the derived build project into Studio | 7.7.0 | `rokit add rojo-rbx/rojo` |
@@ -716,7 +720,10 @@ Shapes you may still meet in older tutorials:
 - **`larvae fmt` described as stylua parity out of the box.** `magic_trailing_comma`, `space_inside_braces` and `trailing_comma` are larvae's own and default to on, so the first run will touch your tables. `[fmt] recommended = false` is the switch that makes parity true, and it appears in neither the README nor `larvae.example.toml`.
 - **`[worms] name = "owner/repo@version"`, and `larvae worm develop`.** The string form was removed in v0.5.0 and is refused with a message telling you what to write; the `develop` subcommand never existed — it is `larvae worm run`. Both still appear in upstream docs, including `larvae.example.toml` and `luaux-worm`'s README.
 - **"Naming a worm makes larvae fetch it."** `larvae.example.toml` says so and it is not true: no command downloads a worm except `larvae worm install`, and the editor never downloads at all.
-- **`larvae-lsp` 0.8.0 from crates.io.** It was never published — the build script rewrote a vendored source in place and cargo refused the package. Install 0.8.1, or 0.8.0 from the git tag.
+- **`cargo install larvae-lsp`, `larvae analyze`, and "the second binary carries the types".** The `larvae-lsp` crate and binary were removed in 0.10 (the crate stops at 0.9.0 on crates.io), and so was `larvae analyze`. larvae serves no types: install luau-lsp beside it, and use `luau-lsp analyze` in a terminal. `larvae self install` and `self update` delete a leftover `larvae-lsp`.
+- **`[lsp] analyzer`, `roblox_security_level`, `definitions`, `sourcemap*`, and the `[lsp.completion]`, `[lsp.inlay_hints]`, `[lsp.hover]`, `[lsp.studio]`, `[lsp.fflags]` tables.** Retired in 0.10. They still load, with one editor warning each, and do nothing; their jobs are luau-lsp settings now (`luau-lsp.types.definitionFiles`, `luau-lsp.inlayHints.*`, `luau-lsp.sourcemap.*`). `[lsp]` keeps `enabled`, `claim_only` and `[lsp.<worm>]`.
+- **A worm's `[lsp]` hooks — `resolve`, `declarations`, `respond`, `serves_luau` — and "they need the native form".** Removed in 0.10 with the analyzer they fed. A manifest that declares them loads with one note per worm and the hooks do nothing; the `larvae-worm` SDK dropped the `lsp_*` handler methods, so a native worm that implements one no longer compiles.
+- **"A profile may overlay only nine tables."** The schema said so until 0.10; a profile now takes every root key except `extends` and `profile`, `[lsp]`, `[rojo]`, `[check]` and `[worms]` included.
 - **A `selene.toml` or `stylua.toml` you were told to delete.** Both are still read, and `[lint]` and `[fmt]` layer over them. Migrating can be gradual.
 - **Advice to run Luau's own lints alongside larvae's.** larvae covers all 28, keeping Luau's level for each and reporting the narrower type-free case where Luau would consult the type checker. `larvae init` disables them in `.luaurc` — but only when there is a `.luaurc` that has not already spoken about `lint`, so check yours.
 - **"`[check]` is a set of levels you can turn off."** Three of its four keys take a level and `allow` really does silence them — but an unresolvable require and a realm violation are reported whatever `[check]` and `[requires]` say, because they are requires that cannot work rather than opinions about style. `[check]` also has no `info` level, although `[lint]` does.

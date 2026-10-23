@@ -12,7 +12,7 @@ A shop row built in plain Luau is a nest of calls, `React.createElement('TextBut
 
 **Row.alx**
 
-```luaux
+```alx
 import * as React from '@game/ReplicatedStorage/Packages/React'
 
 type RowProps = {

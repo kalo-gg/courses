@@ -4,10 +4,10 @@
 
 ---
 
-larvae replaces the usual pile of stylua, selene, darklua and a language server with a single Rust toolchain. This course covers the config every command reads, the require rewriter and its realm check, formatting and linting with a migration path from the tools you already run, builds with rules and profiles, worms — the extension mechanism that lets larvae handle languages that are not Luau at all — and the editor server and CI gates a team runs it through. Two projects bring one repository, **Lantern**, under larvae: first its config and lint migration, then a release build with profiles, a worm for its markup and the workflow that gates it.
+larvae replaces the usual pile of stylua, selene and darklua with a single Rust binary, and runs beside luau-lsp in the editor. This course, written for larvae 0.10, covers the config every command reads, the require rewriter and its realm check, formatting and linting with a migration path from the tools you already run, builds with rules and profiles, worms — the extension mechanism that lets larvae handle languages that are not Luau at all — and the editor setup beside luau-lsp and the CI gates a team runs it through. Two projects bring one repository, **Lantern**, under larvae: first its config and lint migration, then a release build with profiles, a worm for its markup and the workflow that gates it.
 
 - **Library** [larvae](https://github.com/larvae-luau/larvae)
-- **Verified against** 0.8.1
+- **Verified against** 0.10.0
 - **Course** 6 modules · 32 lessons on kalo.gg, 24 of them written out here
 - **Authors** @crota, @sav · endorsed by @sav
 

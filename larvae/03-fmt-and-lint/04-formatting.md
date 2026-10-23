@@ -23,7 +23,8 @@ space_inside_braces = true     # { a } rather than {a}
 trailing_comma = true          # a table that broke keeps its last comma
 
 block_newline_gaps = "never"   # or "preserve", a blank line at a block's edge
-call_chains = { style = "preserve", min_calls = 3 }
+table_newline_gaps = "preserve" # or "never": the blank lines between a table's fields
+call_chains = { style = "preserve", min_calls = 3, preserve_breaks = true }
 ```
 
 They are on because the Luau community already writes that way — which is a good reason, and still a change to a repo that does not.

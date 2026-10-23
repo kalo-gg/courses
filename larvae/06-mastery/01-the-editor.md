@@ -1,61 +1,65 @@
 # The editor server
 
-*The lsp table: what the server answers, which files it claims, and where the types come from.*
+*Two servers per Luau file: what larvae lsp answers, the [lsp] table that is left, and where the types live now.*
 
 Larvae · Larvae for a Team · 10 min
 
 ---
 
-Everything so far was the CLI. The same config drives the editor: `larvae lsp` serves lints, formatting, code actions and the outline over stdio, and `larvae-lsp` — the second binary — plugs Luau's analysis frontend into the same server for hover, completion and type diagnostics. `[lsp]` is the table that says how much of that to answer, and for which files.
+Everything so far was the CLI. In the editor, two servers share each Luau file. `larvae lsp` publishes the lint findings — a worm's findings and the cross-realm requires included — formats the file, and offers the fixes, through the same code the commands run, so the terminal and the editor cannot disagree. **luau-lsp** serves the types: hover, completion, inlay hints, type diagnostics and go to definition. larvae advertises nothing luau-lsp answers, so the two never compete.
 
-**What the server answers**
-
-```toml
-[lsp]
-enabled = true         # false answers every request with nothing: another server owns the files
-claim_only = false     # true answers only for worm-claimed files; stock luau-lsp keeps .luau
-analyzer = true        # false keeps lints, format, actions and outline; hover, completion and types go
-roblox_security_level = "roblox-script-security"   # or "none", "local-user-security", "plugin-security"
-```
-
-## Where the types come from
-
-**The world the analyzer types against**
+**What is left of [lsp]**
 
 ```toml
 [lsp]
-sourcemap = "sourcemap.json"                  # the rojo sourcemap it reads
-sourcemap_autogenerate = true                 # the server runs the sourcemap command itself
-rojo_project_file = "default.project.json"    # the project that command reads
-definitions = ["types/globals.d.luau"]        # extra type definitions, after the platform globals
-documentation = ["types/documentation.json"]  # luau-lsp documentation JSON, for hover
+enabled = true       # false answers every request with nothing: another server owns the files
+claim_only = false   # true lints and formats only worm-claimed files; other tools keep plain Luau
+
+[lsp.markup]         # one worm's editor settings, checked against the [options] it declares
+strict = false
 ```
 
-**The same world, in the terminal**
+That is the whole table. The Larvae extension takes no server settings of its own, so a checkout behaves the same for everyone who opens it.
 
-```bash
-larvae analyze src --definitions types/globals.d.luau   # spawns larvae-lsp; nothing without it
-larvae self code                                        # completion and hover on larvae.toml itself
+## Where the types went
+
+| Before 0.10, in larvae | Now, in luau-lsp |
+| --- | --- |
+| `[lsp] definitions` | `luau-lsp.types.definitionFiles`, a map: `{ "@lantern": "types/lantern.d.luau" }` |
+| `sourcemap_autogenerate`, `rojo_project_file` | `luau-lsp.sourcemap.autogenerate` (on by default) and `luau-lsp.sourcemap.rojoProjectFile` |
+| `[lsp.inlay_hints] parameter_names` | `luau-lsp.inlayHints.parameterNames` |
+| `[lsp.completion.imports] use_const` | `luau-lsp.completion.imports.useConst` |
+| `larvae analyze --definitions <file>` | `luau-lsp analyze --definitions:@lantern=types/lantern.d.luau` |
+
+Nothing about types moved into a new larvae setting. Each key went to the luau-lsp setting that already did the job, so a team that ran both servers before 0.10 deletes lines and adds none. luau-lsp also regenerates the sourcemap by itself, running `rojo sourcemap --watch`, and larvae spawns no rojo process at all. The file below is the whole editor setup in VS Code.
+
+**.vscode/settings.json**
+
+```json
+{
+  "[luau]": {
+    "editor.defaultFormatter": "AndrewBordis.larvae",
+    "editor.formatOnSave": true
+  },
+  "luau-lsp.types.definitionFiles": { "@lantern": "types/lantern.d.luau" }
+}
 ```
 
-The analyzer needs two things it cannot infer from the source: the shape of the DataModel, which the Rojo sourcemap gives it, and any globals your project defines, which `definitions` files give it. The server can run rojo's sourcemap watch itself, or stay out of the way of one you already run — `sourcemap_autogenerate = false`. `larvae analyze` takes the same definitions on the command line, so CI and the editor type against the same world.
+An editor formats a file with one server, so name larvae for `[luau]`; luau-lsp then owns everything about types. In Zed, the same choice is `languages.Luau.formatter` naming the `larvae` language server.
 
-| Table | Keys | Does |
-| --- | --- | --- |
-| `[lsp.completion.imports]` | `enabled`, `require_style` (`auto`, `always_relative`, `always_absolute`, `nearest_absolute`), `use_const` | Auto-imports a service or module the file has not required yet |
-| `[lsp.inlay_hints]` | `variable_types`, `parameter_types`, `function_return_types`, `parameter_names` (`none`, `literals`, `all`) | Every one off by default |
-| `[lsp.studio]` | `enabled`, `port` (3773) | The Studio plugin link; off, because it opens a socket |
-| `[lsp.fflags]` | `enable_new_solver`, `enable_by_default`, `over` | Luau's own analysis flags |
-
-> **Kalo runs this**
+> **Recognising older code**
 >
-> Every editor in this course talks to `larvae-lsp` on Kalo's server, with a `larvae.toml` beside the documents that loads the LuauX worm — which is why a `.luaux` file here gets hover and completion, and why a document has to end in `.luaux` to be lowered at all. Initialized with no workspace root the server never finds that config, and every hover in markup answers `*error-type*`.
+> A 0.8 or 0.9 `larvae.toml` may set `analyzer`, `roblox_security_level`, `definitions` or `sourcemap` under `[lsp]`, or tables such as `[lsp.inlay_hints]` and `[lsp.fflags]`. They still load — the editor shows one warning per key, naming luau-lsp — and do nothing. Move what you need into luau-lsp's settings with the table above, and delete the rest.
+
+> **A .luaux file gets no types**
+>
+> `larvae lsp` still hands a `.luaux` buffer to its worm, so markup gets its findings, its layout and its fixes from the first keystroke. But nothing types it any more: no hover, no completion, and a require of a `.luaux` module has no type in luau-lsp. In Zed, which sends a server files by language, a `.luaux` file gets no larvae diagnostics yet either.
 
 `larvae self code` is the last editor job, and it is about `larvae.toml` itself: it wires the config's JSON schema into the editor — through the TOML extension's settings when one is installed, or a `#:schema` line at the top of the file when not — so every key and every lint name, worm lints included, completes as you type it.
 
 **Key points**
 
-- `larvae lsp` carries lints, format, code actions and the outline; `larvae-lsp` adds the types.
-- `enabled`, `claim_only` and `analyzer` are the three ways to answer less; `claim_only = true` is how larvae runs beside luau-lsp.
-- The analyzer types against the Rojo sourcemap and your `definitions`; `larvae analyze` takes the same files.
-- `larvae self code` makes `larvae.toml` itself complete as you type.
+- `larvae lsp` lints, formats and offers fixes; luau-lsp, beside it, serves every type.
+- `[lsp]` keeps `enabled`, `claim_only` and `[lsp.<worm>]`; the analyzer's old keys load with a warning and do nothing.
+- Definitions, the sourcemap, inlay hints and type checks in CI are luau-lsp settings and `luau-lsp analyze` now.
+- Name larvae as the Luau formatter, and `larvae self code` makes `larvae.toml` itself complete as you type.

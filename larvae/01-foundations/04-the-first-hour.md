@@ -6,7 +6,7 @@ Larvae · Larvae Foundations · 10 min
 
 ---
 
-You have two binaries and no config. The first hour is six commands, and the first of them writes the config for you — shaped by what the project already has, which is the reassuring part if you are arriving from stylua and selene. The order matters: two of the six change files, and both come after the ones that only look.
+You have larvae on your PATH and no config. The first hour is six commands, and the first of them writes the config for you — shaped by what the project already has, which is the reassuring part if you are arriving from stylua and selene. The order matters: two of the six change files, and both come after the ones that only look.
 
 **Six commands, in order**
 

@@ -1,47 +1,45 @@
 # Installing larvae
 
-*Two binaries, one of which you can miss without noticing, and three switches that adopt only part of it.*
+*One binary by any route, luau-lsp beside it for the types, and three switches that adopt only part of it.*
 
 Larvae · Larvae Foundations · 10 min
 
 ---
 
-larvae is a Rust binary, so the direct route is cargo. But "one binary" has the footnote from the last lesson: the Luau analyzer — hover, completion and type diagnostics — lives in a second crate, `larvae-lsp`, and nothing on screen tells you when it is missing. Install both, whichever route you take.
+larvae is one Rust binary with no runtime dependencies. The CLI and the editor server are the same file: `larvae lsp` is a subcommand, not a second download. Take it from crates.io or from a release zip, then let `larvae self install` put it on your `PATH`. The types are a separate install, and the one people forget.
 
 **Install**
 
 ```bash
 cargo install larvae
 
-# the Luau analyzer lives in a second crate
-cargo install larvae-lsp
+# or unzip larvae-<os>-<arch>.zip from the GitHub release, then:
+larvae self install      # copies the binary to ~/.larvae/bin and prints the PATH line
 ```
 
-> **Why two crates, and what you lose with one**
+> **The types are a second install**
 >
-> `larvae lsp` — the subcommand — serves lints, formatting, code actions and the outline. The **types** are not in it. `larvae-lsp` — the binary — is the same server with Luau's analysis frontend plugged into it, which is what adds hover, completion and type diagnostics. And `larvae analyze` is nothing but a launcher for that binary: without it the command has no analyzer to run.
->
-> So an install with only the first crate leaves you with a linter that works and an editor that silently gives you no types, with nothing on screen saying why.
+> larvae serves no hover, no completion and no type diagnostics. In VS Code, install the **luau-lsp** extension beside the Larvae extension; in Zed, the Luau extension beside larvae's. Skip it and you get lints and formatting in an editor that shows no types, with nothing on screen saying why.
 
 ## Through a tool manager
 
-**If you installed through a tool manager**
+**Pinning it, and the rest of `self`**
 
 ```bash
-larvae self install          # copies to ~/.larvae/bin and fetches the two missing files
-larvae self update           # later, for the newest release
-larvae self code             # completion and hover on larvae.toml itself
-larvae self sync-luaurc      # write [aliases] into .luaurc, as paths an editor can follow
+rokit add larvae-luau/larvae      # pins larvae in rokit.toml for everyone who clones
+larvae self update                # updates only a copy that self install made
+larvae self code                  # completion and hover on larvae.toml itself
+larvae self sync-luaurc           # write [aliases] into .luaurc, as paths an editor can follow
 larvae self sync-luaurc --check   # write nothing; exit non-zero if it would change
 ```
 
-rokit, aftman and ember install the one binary their manifest names, so `larvae-lsp` and its analyzer library never land beside it. `larvae self install` fetches them — the three files ship in one release archive. If it cannot, it says so rather than leaving the editor half-served.
+A release zip holds the one binary, so a tool manager installs all of larvae. `self update` refuses a copy that rokit, aftman, lpm or cargo owns and points at that manifest instead: bump the pin there, so the manifest and the file on disk agree.
 
-> **larvae-lsp 0.8.0 is not on crates.io**
+> **Recognising older code**
 >
-> Only if you are pinning an old version: 0.8.0 of the *server* crate was never published, because its build script rewrote a vendored source in place and cargo refuses to package a build that modifies its own sources. Install **0.8.1**, or take 0.8.0 from the git tag.
+> Guides written before 0.10 install a second crate with `cargo install larvae-lsp` and type-check with `larvae analyze`. Both are gone: the crate stops at 0.9.0 on crates.io, and the subcommand no longer exists. Skip the first. For the second, use `luau-lsp analyze`.
 
-Whichever route you took, the test is the same: open a Luau file, hover a local, and look for a type. No type means the second binary is missing, whatever the install said. Kalo's own editors pass that test because the server behind them is `larvae-lsp`.
+Whichever route you took, the test is the same. Open a Luau file and hover a local: no type means luau-lsp is missing. Then run *Format Document*: nothing happening means the Larvae extension cannot find `larvae`. It looks on `PATH` first, then in `~/.larvae/bin`, and its `larvae.path` setting names any other location.
 
 ## Taking only the part you want
 
@@ -57,15 +55,15 @@ enabled = false     # keep stylua; larvae never rewrites a file
 enabled = false     # keep selene
 
 [lsp]
-claim_only = true   # the editor server answers only for worm-claimed files,
-                    # so stock luau-lsp keeps every plain .luau document
+claim_only = true   # the editor server lints and formats only worm-claimed files,
+                    # so another linter and formatter keep plain .luau
 ```
 
-`enabled = false` says it in the config rather than by not running the command — which matters, because the editor reads the same config and would otherwise keep formatting on save. `claim_only` is how larvae runs *beside* luau-lsp rather than instead of it.
+`enabled = false` says it in the config rather than by not running the command — which matters, because the editor reads the same config and would otherwise keep formatting on save. `claim_only` keeps larvae to the files only it can read.
 
 **Key points**
 
-- `cargo install larvae` and `cargo install larvae-lsp`: the second carries the types.
-- Installed through rokit, aftman or ember? `larvae self install` fetches the two files the manifest did not name.
+- `cargo install larvae` or a release zip, then `larvae self install`: one binary, with `larvae lsp` inside it.
+- luau-lsp is the second install, and it carries the types; `self install` and `self update` delete a leftover `larvae-lsp`.
 - `larvae self code` gives your editor completion and hover on `larvae.toml` itself.
 - `[fmt] enabled = false`, `[lint] enabled = false` and `[lsp] claim_only = true` let larvae take one job and leave the rest.
